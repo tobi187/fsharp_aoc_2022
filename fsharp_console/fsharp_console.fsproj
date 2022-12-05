@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="aoc2022\in4.txt" />
+    <None Include="aoc2022\day5.fsx" />
+    <None Include="aoc2022\day3.fsx" />
+    <None Include="aoc2022\d3.in" />
+    <Compile Include="aoc2022\day3.fs" />
+    <Compile Include="codeWars.fsx" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup />
+</Project>
