@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="aoc2022\day10.fsx" />
     <Content Include="aoc2022\in4.txt" />
     <None Include="aoc2022\day5.fsx" />
     <None Include="aoc2022\day3.fsx" />
@@ -12,5 +13,4 @@
     <Compile Include="codeWars.fsx" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-  <ItemGroup />
 </Project>
