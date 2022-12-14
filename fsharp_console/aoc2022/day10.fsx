@@ -15,7 +15,7 @@ let genRes c cc cv res =
 let rec doLine (lines: string[] list) cycle cVal res =
     printfn "cyc: %i; val: %i" cycle cVal
     match lines with
-    | [] -> res
+    | [] -> res |> List.sum
     | head :: tail ->
         match head.[0] with
         | "noop" -> 
