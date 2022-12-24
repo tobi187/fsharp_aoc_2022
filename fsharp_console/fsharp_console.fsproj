@@ -4,6 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="aoc2022\22.in" />
+    <None Include="aoc2022\d22.fsx" />
     <Content Include="aoc2022\d14.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
