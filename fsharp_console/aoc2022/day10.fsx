@@ -15,7 +15,7 @@ let genRes c cc cv res =
 let rec doLine (lines: string[] list) cycle cVal res =
     printfn "cyc: %i; val: %i" cycle cVal
     match lines with
-    | [] -> res |> List.sum
+    | [] -> res
     | head :: tail ->
         match head.[0] with
         | "noop" -> 
@@ -28,5 +28,32 @@ let rec doLine (lines: string[] list) cycle cVal res =
         | _ -> failwith "a"
 
 
-doLine file 1 1 []
-|> printfn "%A"
+let draw cV cyc res l =
+    printfn "v: %i; c: %i l: %i" cV cyc l
+    List.init l (fun i -> (i + cyc) % 40)
+    |> List.map (fun v -> if abs (v-cV) < 2 then '#' else '.')
+    |> List.append res  
+
+let rec step (lines: string[] list) cycle cVal res =
+    match lines with
+    | [] -> 
+        res
+        |> List.chunkBySize 40
+        |> List.map List.toArray
+        |> List.map String
+        |> List.toArray
+    | head :: tail ->        
+        match head.[0] with
+        | "noop" -> 
+            let nRes = draw cVal cycle res 1
+            step tail (cycle+1) cVal nRes  
+        | "addx" ->
+            let num = cVal + int head.[1]
+            let nRes = draw cVal cycle res 2
+            step tail (cycle+2) num nRes
+        | _ -> failwith "a"
+
+
+let d = step file 0 1 List.empty 
+
+String.Join ("\n", d)  |> printfn "%A" 
