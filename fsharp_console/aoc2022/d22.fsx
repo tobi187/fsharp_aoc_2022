@@ -24,7 +24,7 @@ let rec parseInstructions mess res =
         
 let gline = g.Split "\r\n" |> Array.map (Seq.toArray)
 
-let xLen = gline.[0].Length
+let xLen = gline |> Array.maxBy Array.length |> Array.length
 let yLen = gline.Length
 
 let instructions = parseInstructions (i.Trim() |> Seq.toList) ["R"]

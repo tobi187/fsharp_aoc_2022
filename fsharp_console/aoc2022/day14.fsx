@@ -47,7 +47,7 @@ let highest = rocks |> Array.maxBy snd |> snd
 
 //let printer = grid |> List.take 10 |> List.map (fun x -> x |> List.fold (fun s a -> s + a.symbol) "") |> List.iter (printfn "%s\n")
 
-let entry = (500, highest + 1)
+let entry = (500, 0)
 
 let con v offset l =
     match offset with
@@ -57,14 +57,25 @@ let con v offset l =
 
 let rec fall res point =
     let all = Array.append res rocks
-    match point with
+    let next = (fst point, snd point + 1)
+    match next with
     | p when con p 0 all -> 
         match p with
-        | np when not (con p -1 all) -> fall res (fst p - 1, snd p - 1) 
-        | np when not (con p 1 all) -> fall res (fst p + 1, snd p - 1)
-        | np -> fall (Array.append [|(fst np, snd np + 1)|] res) entry
-    | p when snd p < lowest -> res |> Array.length
-    | p -> fall res (fst p, snd p - 1)
+        | np when not (con np -1 all) -> fall res (fst np - 1, snd np) 
+        | np when not (con np 1 all) -> fall res (fst np + 1, snd np)
+        | _ -> fall (Array.append [| point |] res) entry
+    | p when snd p > highest -> res
+    | p -> fall res p
     
     
-fall Array.empty entry |> printfn "result: %i"
+let r = fall Array.empty entry 
+
+let d = List.init 10 (fun y -> List.init 20 (fun x -> (x + 490, y)))
+
+d
+|> List.map (fun l -> l |> List.map (fun e -> match e with
+                                              | _ when Array.contains e rocks -> '#'
+                                              | _ when Array.contains e r -> 'o'
+                                              | _ -> '.'))
+|> List.map (fun s -> String.Join("", s))
+|> List.iter (printfn "%A\n")
