@@ -1,7 +1,7 @@
 ﻿open System
 open System.IO
 
-let [| g; i |] = File.ReadAllText("22.in").Split "\r\n\r\n"
+let [| g; i |] = File.ReadAllText(@"C:\Users\fisch\Desktop\projects\tests\fsharp_console\fsharp_console\aoc2022\22.in").Split "\r\n\r\n"
 
 type Point = {
     x: int
@@ -22,14 +22,16 @@ let rec parseInstructions mess res =
         | x when Char.IsLetter res.Head.[0] -> parseInstructions tail (string x :: res)
         | x -> parseInstructions tail (res.Head + (string x) :: res.Tail)
         
-let gline = g.Split "\r\n" |> Array.map (Seq.toArray)
+let gl = g.Split "\r\n"
 
-let xLen = gline |> Array.maxBy Array.length |> Array.length
-let yLen = gline.Length
+let xLen = gl |> Array.maxBy String.length |> String.length
+let yLen = gl.Length
+
+let gline = gl |> Array.map (fun s -> s.PadRight xLen) |> Array.map Seq.toArray 
 
 let instructions = parseInstructions (i.Trim() |> Seq.toList) ["R"]
 
-let grid = 
+(*let grid = 
     [
         for y = 0 to (gline.Length - 1) do
             for x = 0 to (gline.[0].Length - 1) do
@@ -38,7 +40,7 @@ let grid =
                 | '.' -> yield {x=x; y=y; sym="."}
                 | '#' -> yield {x=x; y=y; sym="#"}
                 | e -> failwith $"wtf is that char {e}"
-    ]
+    ]*)
 
 
 type Pos = {
@@ -50,16 +52,17 @@ type Pos = {
 let getRow y = gline |> Array.map (fun x -> x.[y]) |> Array.indexed |> Array.filter (fun e -> snd e <> ' ') |> Array.map fst
 let getXRow y = gline.[y] |> Array.indexed |> Array.filter (fun e -> snd e <> ' ') |> Array.map fst
 
+let check x y = try gline.[y].[x] <> ' ' with | :? System.IndexOutOfRangeException -> false  
 
 let getNewPos pos =
     match pos.dir with
-    | "N" -> if pos.y > 0 then { pos with y = pos.y - 1 } 
+    | "N" -> if check pos.x (pos.y - 1) then { pos with y = pos.y - 1 } 
              else { pos with y = getRow pos.x |> Array.last }
-    | "S" -> if pos.y + 1 < yLen then { pos with y = pos.y + 1 }
+    | "S" -> if check pos.x (pos.y + 1) then { pos with y = pos.y + 1 }
              else { pos with y = getRow pos.x |> Array.head }
-    | "E" -> if pos.x + 1 < xLen then { pos with x = pos.x + 1 } 
+    | "E" -> if check (pos.x + 1) pos.y then { pos with x = pos.x + 1 } 
              else { pos with x = getXRow pos.y |> Array.head }
-    | "W" -> if pos.x > 0 then { pos with x = pos.x - 1 }
+    | "W" -> if check (pos.x - 1) pos.y then { pos with x = pos.x - 1 }
              else { pos with x = getXRow pos.y |> Array.last }
     | _ -> failwith "aa"
 
@@ -68,9 +71,9 @@ let rec step pos steps =
     | 0 -> pos
     | _ -> 
         let newPos = getNewPos pos
-        match gline.[pos.y].[pos.x] with
+        match gline.[newPos.y].[newPos.x] with
         | '#' -> step pos 0
-        | ' ' -> failwith $"How can a empty occur here, x:{newPos.x} | y: {newPos.y} | dir: {newPos.dir}"
+        | ' ' ->  failwith "A"
         | _ -> step newPos (steps - 1)
 
 
@@ -83,7 +86,15 @@ let walk pos comm =
     | ("R", "W")|("L", "E") -> step { pos with dir = "N" } len
     | u -> failwith $"dir unkown: {u}"
 
+let gd d =
+    match d with
+    | "E" -> 0
+    | "S" -> 1
+    | "W" -> 2
+    | "N" -> 3
+    | _ -> failwith ""
 
 instructions
 |> List.fold walk {x = getXRow 0 |> Array.head; y = 0; dir = "N"}
-|> printfn "Result: %A"
+|> (fun r -> (r.y+1) * 1000 + (r.x+1) * 4 + gd r.dir)
+|> printfn "res: %A"

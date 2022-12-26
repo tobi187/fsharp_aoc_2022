@@ -52,15 +52,17 @@ type Pos = {
 let getRow y = gline |> Array.map (fun x -> x.[y]) |> Array.indexed |> Array.filter (fun e -> snd e <> ' ') |> Array.map fst
 let getXRow y = gline.[y] |> Array.indexed |> Array.filter (fun e -> snd e <> ' ') |> Array.map fst
 
+let check x y = try gline.[y].[x] <> ' ' with | :? System.IndexOutOfRangeException -> false  
+
 let getNewPos pos =
     match pos.dir with
-    | "N" -> if pos.y > 0 then { pos with y = pos.y - 1 } 
+    | "N" -> if check pos.x (pos.y - 1) then { pos with y = pos.y - 1 } 
              else { pos with y = getRow pos.x |> Array.last }
-    | "S" -> if pos.y + 1 < yLen then { pos with y = pos.y + 1 }
+    | "S" -> if check pos.x (pos.y + 1) then { pos with y = pos.y + 1 }
              else { pos with y = getRow pos.x |> Array.head }
-    | "E" -> if pos.x + 1 < xLen then { pos with x = pos.x + 1 } 
+    | "E" -> if check (pos.x + 1) pos.y then { pos with x = pos.x + 1 } 
              else { pos with x = getXRow pos.y |> Array.head }
-    | "W" -> if pos.x > 0 then { pos with x = pos.x - 1 }
+    | "W" -> if check (pos.x - 1) pos.y then { pos with x = pos.x - 1 }
              else { pos with x = getXRow pos.y |> Array.last }
     | _ -> failwith "aa"
 
@@ -94,6 +96,5 @@ let gd d =
 
 instructions
 |> List.fold walk {x = getXRow 0 |> Array.head; y = 0; dir = "N"}
+|> (fun r -> (r.y+1) * 1000 + (r.x+1) * 4 + gd r.dir)
 |> printfn "res: %A"
-
-//|> (fun r -> (r.y-1) * 1000 + (r.x-1) * 4 + gd r.dir)
