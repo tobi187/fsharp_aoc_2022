@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,10 +11,24 @@ namespace aoc22
 {
     internal class d24
     {
-        public Dictionary<(int, int)>
+        public Dictionary<(int, int), Position> postitions = new();
         public void Readf()
         {
             var file = File.ReadAllLines("24.txt").Select(x => x.ToArray());
+            var yLen = file.Count();
+            var xLen = file.Select(x => x.Length).Max();
+            for (var y = 0; y < yLen; y++)
+                for (var x = 0; x < xLen; x++)
+                    if (file.ElementAt(y)[x] == '#')
+                        postitions.Add((x, y), new Wall(x, y, xLen, yLen, postitions));
+                    else
+                        postitions.Add((x, y), new Position(x, y, xLen, yLen, postitions));
+
+            Walk();
+        }
+
+        private void Walk()
+        {
 
         }
     }
@@ -27,15 +42,16 @@ namespace aoc22
         public Dictionary<(int, int), Position> pos { get; set; }
         public List<string> childs = new List<string>();
         public int added { get; set; } = 0;
-        public Position(int x, int y, int xl, int yl) 
+        public Position(int x, int y, int xl, int yl, Dictionary<(int, int), Position> d) 
         {
             this.x = x;
             this.y = y;
             xLen = xl;
             yLen = yl;
+            pos = d;    
         }
 
-        public void Add(string child)
+        public virtual void Add(string child)
         {
             childs.Add(child);
             added++;
@@ -53,7 +69,7 @@ namespace aoc22
             }
         }
 
-        public void Distribute()
+        public virtual void Distribute()
         {
             for (var i = 0; i < childs.Count - added; i++)
             {
@@ -64,5 +80,17 @@ namespace aoc22
             childs.RemoveRange(0, added);
             added = 0;
         }
+    }
+
+    public class Wall : Position
+    {
+        public Wall(int x, int y, int xl, int yl, Dictionary<(int, int), Position> d) : base(x, y, xl, yl, d) { }
+
+        public override void Add(string child)
+        {
+            throw new Exception();
+        }
+
+        public override void Distribute() { }
     }
 }
